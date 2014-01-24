@@ -26,6 +26,7 @@ foreach( $domains as $domain )
 		
 	$curl = new mycurl( true, 10, 10 );
 	$curl->createCurl( $url );
+
 	$result = $plugins->applyTo( $curl );
 
 #	print "\n$domain:\n";
@@ -149,12 +150,13 @@ abstract class CensusPluginRegexp extends CensusPlugin
 {
 	protected $regexp = null;
 	protected $caseSensitive = true;
+	protected $insideTags = true;
 	protected $datatype = "xsd:boolean";
 	public function applyTo( $curl )
 	{
 		$opts = "";
 		if( $this->caseSensitive == false ) { $opts .= "i"; }
-		if( preg_match( "/".$this->regexp."/".$opts, $curl->webpage ) )
+		if( preg_match( "/".$this->regexp."/".$opts, $this->insideTags?$curl->webpage:$curl->text ) )
 		{
 			return true;
 		}
@@ -169,12 +171,33 @@ abstract class CensusPluginRegexp extends CensusPlugin
 	}
 }
 
+abstract class CensusPluginRegexpCount extends CensusPlugin
+{
+	protected $regexp = null;
+	protected $caseSensitive = true;
+	protected $insideTags = true;
+	protected $datatype = "xsd:integer";
+	public function applyTo( $curl )
+	{
+		$opts = "";
+		if( $this->caseSensitive == false ) { $opts .= "i"; }
+		
+		$parts = preg_split( "/".$this->regexp."/".$opts, $this->insideTags?$curl->webpage:$curl->text );
+		return sizeof( $parts )-1;
+	}		
+	function resultToGraph( $graph, $result, $observation_uri )
+	{
+		$graph->t( $observation_uri, "obsacuk:".$this->id(), $result, $this->datatype );
+	}
+}
+
 ##############################
 
 abstract class CensusPluginRegexpList extends CensusPlugin
 {
 	protected $regexp = null;
 	protected $caseSensitive = true;
+	protected $insideTags = true;
 	private $r; # temporary variable to store results of applyTo
 	public function applyTo( $curl )
 	{
@@ -185,7 +208,7 @@ abstract class CensusPluginRegexpList extends CensusPlugin
 		preg_replace_callback( 
 			"/".$this->regexp."/".$opts, 
 			"self::processMatch",
-			$curl->webpage );
+			$this->insideTags?$curl->webpage:$curl->text );
 		ksort( $this->r );
 		return array_keys( $this->r );
 	}		
@@ -236,6 +259,7 @@ class mycurl {
 
      protected $_session;
      public $webpage;
+     public $text;
      protected $_responseHeaders;
      protected $_includeHeader;
      protected $_noBody;
@@ -340,6 +364,8 @@ class mycurl {
          $this->webpage = curl_exec($s);
          $this->_status = curl_getinfo($s,CURLINFO_HTTP_CODE);
          $this->_info = curl_getinfo($s);
+
+         $this->text = strip_tags( $this->webpage );
          curl_close($s);
 
      }
