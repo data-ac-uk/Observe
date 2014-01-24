@@ -7,22 +7,36 @@ $plugins->loadDir( "plugins.d" );
 $domains = array(
 	"totl.net",
 	"ecs.soton.ac.uk",
-	"soton.ac.uk",
 	"eprints.org",
 	"microsoft.com" );
 
+foreach( file( "unis.urls" ) as $line )
+{
+	$domains []= trim( $line );
+}
+
+
+require_once( "arc/ARC2.php" );
+require_once( "Graphite/Graphite.php" ); #only used for RDF output.
+
+$ttl = 10;
 foreach( $domains as $domain )
 {
-	$url = "http://www.$domain/";
+	$url = "http://$domain/";
 		
 	$curl = new mycurl( true, 10, 10 );
 	$curl->createCurl( $url );
 	$result = $plugins->applyTo( $curl );
 
-	print "\n$domain:\n";
-	print json_encode($result );
-	print "\n";
-}	
+#	print "\n$domain:\n";
+#	print json_encode($result );
+#	print "\n";
+
+	$graph = new Graphite();
+	$graph->ns( "obsacuk", "http://observatory.data.ac.uk/vocab#" );
+	$plugins->resultsToGraph( $graph, $result, $domain, date("c") );
+	print $graph->serialize("NTriples");
+}
 
 
 
@@ -95,13 +109,38 @@ class CensusPluginRegister
 		}
 		return $result;
 	}
+
+	public function resultsToGraph( $graph, $result, $domain, $datestamp )
+	{
+		$t = array();
+		$observation_uri = "http://observatory.data.ac.uk/observation/$domain/$datestamp";
+		$domain_uri = "http://observatory.data.ac.uk/domain/$domain";
+		$graph->resource( $observation_uri )
+			->add( "rdf:type", "obsacuk:Observation" )
+			->add( "dct:date", $datestamp, "xsd:datetime" )
+			->add( "obsacuk:domain", $domain_uri );
+		$graph->resource( $domain_uri )
+			->add( "rdf:type", "obsacuk:Domain" )
+			->add( "rdfs:label", $domain );
+		foreach( $this->plugins as $plugin )
+		{
+			$result []= $plugin->resultToGraph( $graph, $result[$plugin->id()], $observation_uri );
+		}
+		return $t;
+	}
 }
 
 abstract class CensusPlugin 
 {
 	protected $id = null;
+	protected $datatype = "xsd:string";
 	function id() { return $this->id; }
 	abstract function applyTo( $curl );
+
+	function resultToGraph( $graph, $result, $observation_uri )
+	{
+		$graph->t( $observation_uri, "obsacuk:".$this->id(), $result, $datatype );
+	}
 }
 
 #######
@@ -110,6 +149,7 @@ abstract class CensusPluginRegexp extends CensusPlugin
 {
 	protected $regexp = null;
 	protected $caseSensitive = true;
+	protected $datatype = "xsd:boolean";
 	public function applyTo( $curl )
 	{
 		$opts = "";
@@ -123,6 +163,10 @@ abstract class CensusPluginRegexp extends CensusPlugin
 			return false;
 		}
 	}		
+	function resultToGraph( $graph, $result, $observation_uri )
+	{
+		$graph->t( $observation_uri, "obsacuk:".$this->id(), $result?"true":"false", $this->datatype );
+	}
 }
 
 ##############################
@@ -166,13 +210,20 @@ abstract class CensusPluginRegexpList extends CensusPlugin
 		return $matches[0]; 
 	}
 	
+	function resultToGraph( $graph, $result, $observation_uri )
+	{
+		foreach( $result as $value )
+		{
+			$graph->t( $observation_uri, "obsacuk:".$this->id(), $value, $this->datatype );
+		}
+	}
 }
 
 
 ######################
 
 
- class mycurl {
+class mycurl {
      protected $_useragent = 'Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1';
      protected $_url;
      protected $_followlocation;
