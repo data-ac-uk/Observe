@@ -3,7 +3,7 @@ class CensusPluginYouTubeAccounts extends CensusPluginRegexpList
 {
 	protected $id = "youtubeAccounts";	
 	protected $caseSensitive = false;
-	protected $regexp = "[='\"]https?:\/\/(www\.)?youtube.com\/user\/([^ >'\"\/\?]+)";
+	protected $regexp = "[='\"]https?:\/\/(www\.)?youtube\.com\/user\/([^ >'\"\/\?]+)";
 	public function addMatch( $matches ) { return $matches[2]; }
 }
 CensusPluginRegister::instance()->register( "CensusPluginYouTubeAccounts" );

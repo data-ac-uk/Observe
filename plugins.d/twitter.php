@@ -3,7 +3,7 @@ class CensusPluginTwitterAccounts extends CensusPluginRegexpList
 {
 	protected $id = "twitterAccounts";	
 	protected $caseSensitive = false;
-	protected $regexp = "[='\"]https?:\/\/(www\.)?twitter.com\/(#!\/)?([^ \/>'\"\?]+)";
+	protected $regexp = "[='\"]https?:\/\/(www\.)?twitter\.com\/(#!\/)?([^ \/>'\"\?]+)";
 	public function addMatch( $matches ) 
 	{ 
 		// no easy way to spot twitter's utility URLs
