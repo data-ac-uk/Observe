@@ -6,7 +6,7 @@ $base_dir = __DIR__;
 require_once( "$base_dir/lib/Observe.php" );
 require_once( "$base_dir/lib/myCurl.php" );
 
-$options = getopt("u:", array("rdf","pretty"));
+$options = getopt("u:p:", array("rdf","pretty","noempty"));
 
 $plugins = CensusPluginRegister::instance();
 $plugins->loadDir( "$base_dir/plugins.d" );
@@ -48,7 +48,19 @@ foreach( $domains as $domain )
 	$curl = new mycurl( true, 10, 10 );
 	$curl->createCurl( $url );
 
-	$result = $plugins->applyTo( $curl );
+	if(array_key_exists("p",$options))
+	{
+		$result = $plugins->plugin( $options["p"] )->applyTo( $curl );
+	}
+	else
+	{
+		$result = $plugins->applyTo( $curl );
+	}
+
+	if( empty( $result ) && array_key_exists("noempty",$options) )
+	{
+		continue;
+	}
 
 	print "\n$domain:\n";
 	print json_encode($result, $JSON_OPTS );
