@@ -27,17 +27,11 @@ if(array_key_exists("u",$options))
 	$domains = array($options["u"]);
 }
 
-$arc2 = "$base_dir/../arc2/ARC2.php";
-$graphite = "$base_dir/../Graphite/Graphite.php";
-$rdfout = array_key_exists("rdf", $options) && file_exists($arc2) && file_exists($graphite);
-if( $rdfout ){
-	require_once( "../arc2/ARC2.php" );
-	require_once( "../Graphite/Graphite.php" ); #only used for RDF output.
-}
-elseif(array_key_exists("rdf", $options))
+$rdfout = array_key_exists("rdf", $options);
+if( $rdfout )
 {
-	print "unable to output rdf because graphite or arc2 not found. exiting...\n\n";
-	exit;
+	require_once( "$base_dir/lib/arc2/ARC2.php" );
+	require_once( "$base_dir/lib/Graphite/Graphite.php" ); #only used for RDF output.
 }
 
 $ttl = 10;	
