@@ -1,3 +1,9 @@
 [submodule "lib/Text-Statistics"]
 	path = lib/Text-Statistics
 	url = https://github.com/DaveChild/Text-Statistics.git
+[submodule "lib/Graphite"]
+	path = lib/Graphite
+	url = https://github.com/cgutteridge/Graphite.git
+[submodule "lib/arc2"]
+	path = lib/arc2
+	url = https://github.com/semsol/arc2.git
