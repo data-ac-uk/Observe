@@ -12,12 +12,12 @@ $plugins = CensusPluginRegister::instance();
 $plugins->loadDir( "$base_dir/plugins.d" );
 
 $domains = array(
-	"totl.net",
+	"www.rvc.ac.uk",
 	"ecs.soton.ac.uk",
 	"eprints.org",
 	"microsoft.com" );
 
-foreach( file( "unis.urls" ) as $line )
+foreach( file( "$base_dir/unis.urls" ) as $line )
 {
 	$domains []= trim( $line );
 }
