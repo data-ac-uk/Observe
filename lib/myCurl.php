@@ -2,6 +2,11 @@
 	
 ######################
 
+if( !function_exists('curl_init') )
+{
+	print "The PHP CURL library is not enabled. Please install and enable it.\n";
+	exit( 1 );
+}
 
 class mycurl {
      protected $_useragent = 'Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1';

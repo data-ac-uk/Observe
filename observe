@@ -1,12 +1,13 @@
-#!/usr/bin/php
+#!/usr/bin/env php
 <?php
 
+$base_dir = __DIR__;
 
-require_once( "Observe.php" );
-require_once( "myCurl.php" );
+require_once( "$base_dir/lib/Observe.php" );
+require_once( "$base_dir/lib/myCurl.php" );
 
 $plugins = CensusPluginRegister::instance();
-$plugins->loadDir( "plugins.d" );
+$plugins->loadDir( "$base_dir/plugins.d" );
 
 $domains = array(
 	"totl.net",
