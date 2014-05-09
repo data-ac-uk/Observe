@@ -6,8 +6,25 @@ $base_dir = __DIR__;
 require_once( "$base_dir/lib/Observe.php" );
 require_once( "$base_dir/lib/myCurl.php" );
 
-$options = getopt("u:p:", array("rdf","pretty","noempty"));
+$options = getopt("u:p:", array("rdf","pretty","noempty", "help"));
 
+if(array_key_exists("help",$options))
+{
+?>
+
+Observe the options:
+
+ --pretty  = format the JSON nicely
+ --rdf     = output in RDF rather than JSON (N-Triples)
+ --help    = see this text
+ --noempty = skip empty results (handy in combination with -p)
+ 
+ -u <domain> = specify a single domain to observe
+ -p <plugin> = specify a single plugin ID to run
+
+<?php
+	exit;
+}
 $plugins = CensusPluginRegister::instance();
 $plugins->loadDir( "$base_dir/plugins.d" );
 
