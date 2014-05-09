@@ -6,18 +6,35 @@ $base_dir = __DIR__;
 require_once( "$base_dir/lib/Observe.php" );
 require_once( "$base_dir/lib/myCurl.php" );
 
-$options = getopt("u:", array("rdf"));
+$options = getopt("u:p:", array("rdf","pretty","noempty", "help"));
 
+if(array_key_exists("help",$options))
+{
+?>
+
+Observe the options:
+
+ --pretty  = format the JSON nicely
+ --rdf     = output in RDF rather than JSON (N-Triples)
+ --help    = see this text
+ --noempty = skip empty results (handy in combination with -p)
+ 
+ -u <domain> = specify a single domain to observe
+ -p <plugin> = specify a single plugin ID to run
+
+<?php
+	exit;
+}
 $plugins = CensusPluginRegister::instance();
 $plugins->loadDir( "$base_dir/plugins.d" );
 
 $domains = array(
-	"totl.net",
+	"www.rvc.ac.uk",
 	"ecs.soton.ac.uk",
 	"eprints.org",
 	"microsoft.com" );
 
-foreach( file( "unis.urls" ) as $line )
+foreach( file( "$base_dir/unis.urls" ) as $line )
 {
 	$domains []= trim( $line );
 }
@@ -35,6 +52,12 @@ if( $rdfout )
 }
 
 $ttl = 10;	
+$JSON_OPTS = 0;
+if( array_key_exists("pretty", $options))
+{
+	$JSON_OPTS |= JSON_PRETTY_PRINT;
+}
+
 foreach( $domains as $domain )
 {
 	$url = "http://$domain/";
@@ -42,10 +65,22 @@ foreach( $domains as $domain )
 	$curl = new mycurl( true, 10, 10 );
 	$curl->createCurl( $url );
 
-	$result = $plugins->applyTo( $curl );
+	if(array_key_exists("p",$options))
+	{
+		$result = $plugins->plugin( $options["p"] )->applyTo( $curl );
+	}
+	else
+	{
+		$result = $plugins->applyTo( $curl );
+	}
+
+	if( empty( $result ) && array_key_exists("noempty",$options) )
+	{
+		continue;
+	}
 
 	print "\n$domain:\n";
-	print json_encode($result );
+	print json_encode($result, $JSON_OPTS );
 	print "\n";
 
 	if($rdfout)

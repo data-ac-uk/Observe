@@ -5,6 +5,7 @@
 class CensusPluginRegister
 {
 	private static $instance;
+	private $plugins = array();
 
 	public static function instance()
 	{
@@ -28,8 +29,12 @@ class CensusPluginRegister
 		closedir( $dh );
 	}
 			
+	public function plugin( $id ) 
+	{
+		return $this->plugins[$id];
+	}
 
-	private $plugins = array();
+
 	public function register( $class )
 	{
 		$plugin = new $class();
