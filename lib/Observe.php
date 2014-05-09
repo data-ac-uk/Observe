@@ -111,11 +111,21 @@ abstract class CensusPluginRegexp extends CensusPlugin
 	protected $caseSensitive = true;
 	protected $insideTags = true;
 	protected $datatype = "xsd:boolean";
+	protected $onlyHeaders = false;
+
+	
 	public function applyTo( $curl )
 	{
 		$opts = "";
 		if( $this->caseSensitive == false ) { $opts .= "i"; }
-		if( preg_match( "/".$this->regexp."/".$opts, $this->insideTags?$curl->webpage:$curl->text ) )
+		
+		if($this->onlyHeaders){
+			$target = $curl->headers;
+		}else{
+			$target = $this->insideTags?$curl->webpage:$curl->text;
+		}
+		
+		if( preg_match( "/".$this->regexp."/".$opts,  $target) )
 		{
 			return true;
 		}
@@ -136,12 +146,20 @@ abstract class CensusPluginRegexpCount extends CensusPlugin
 	protected $caseSensitive = true;
 	protected $insideTags = true;
 	protected $datatype = "xsd:integer";
+	protected $onlyHeaders = false;
+		
 	public function applyTo( $curl )
 	{
 		$opts = "";
 		if( $this->caseSensitive == false ) { $opts .= "i"; }
 		
-		$parts = preg_split( "/".$this->regexp."/".$opts, $this->insideTags?$curl->webpage:$curl->text );
+		if($this->onlyHeaders){
+			$target = $curl->headers;
+		}else{
+			$target = $this->insideTags?$curl->webpage:$curl->text;
+		}
+		
+		$parts = preg_split( "/".$this->regexp."/".$opts, $target);
 		return sizeof( $parts )-1;
 	}		
 	function resultToGraph( $graph, $result, $observation_uri )
@@ -158,16 +176,25 @@ abstract class CensusPluginRegexpList extends CensusPlugin
 	protected $caseSensitive = true;
 	protected $insideTags = true;
 	private $r; # temporary variable to store results of applyTo
+	protected $onlyHeaders = false;
+	
 	public function applyTo( $curl )
 	{
 		$opts = "";
 		if( $this->caseSensitive == false ) { $opts .= "i"; }
 
+		if($this->onlyHeaders){
+			$target = $curl->headers;
+		}else{
+			$target = $this->insideTags?$curl->webpage:$curl->text;
+		}
+		
+
 		$this->r = array();
 		preg_replace_callback( 
 			"/".$this->regexp."/".$opts, 
 			"self::processMatch",
-			$this->insideTags?$curl->webpage:$curl->text );
+			$target );
 		ksort( $this->r );
 		return array_keys( $this->r );
 	}		
