@@ -4,3 +4,6 @@
 [submodule "lib/arc2"]
 	path = lib/arc2
 	url = https://github.com/semsol/arc2.git
+[submodule "Text-Statistics"]
+	path = Text-Statistics
+	url = git@github.com:patrickmcsweeney/Text-Statistics.git
