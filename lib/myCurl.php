@@ -135,17 +135,13 @@ class mycurl {
 					$this->webpage =  $this->_webpage;
 				}
 				unset( $this->_webpage );
-
+				$this->info = $this->_info;
 
 				$this->text = strip_tags( $this->webpage );
 				curl_close($s);
 
 			}
-			public function getURL()
-			{
-				return $this->_info["url"];
-			}
-
+			
 			public function getHttpHeaders()
 			{
 				return $this->_info;

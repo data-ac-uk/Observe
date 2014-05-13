@@ -33,7 +33,7 @@ class CensusPluginRSS extends CensusPlugin
 		}
 
 		$r = array();
-		$base_url = preg_replace('#^(.*)/+$#', '\1', $curl->getURL());
+		$base_url = preg_replace('#^(.*)/+$#', '\1', $curl->info['url']);
 		
 		foreach(array_keys($urls) as $url)
 		{
