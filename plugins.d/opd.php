@@ -29,7 +29,13 @@ class CensusPluginOPD extends CensusPlugin
 			
 			$tmpcurl = $this->_opd_get("{$base_url}/.well-known/openorg",$base_url);
 			if($tmpcurl['http_code']=='200'){
-				$url = $tmpcurl['url'];
+				//need to check 404's
+				$tmpcurl4 = $this->_opd_get("{$base_url}/404TestURLThatIsReallyLongSoIShouldGetTheCorectHeader",$base_url);
+				if($tmpcurl4['http_code']=='404'){
+					$url = $tmpcurl['url'];
+				}else{
+					return false;
+				}
 			}elseif(strlen($tmpcurl['redirect_url'])){
 				$url = $tmpcurl['redirect_url'];
 			}else{
