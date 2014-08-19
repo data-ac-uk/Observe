@@ -36,7 +36,7 @@ class CensusPluginOPD extends CensusPlugin
 				}else{
 					return false;
 				}
-			}elseif(strlen($tmpcurl['redirect_url'])){
+			}elseif(strlen($tmpcurl['redirect_url']) && $tmpcurl['redirect_url'] != "{$base_url}/.well-known/openorg/"){
 				$url = $tmpcurl['redirect_url'];
 			}else{
 				return false;
