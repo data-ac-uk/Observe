@@ -27,21 +27,14 @@ class CensusPluginOPD extends CensusPlugin
 		
 		if(!isset($url)){
 			$tmpcurl = $this->_opd_get("{$base_url}/.well-known/openorg",$base_url);
-			echo $ext = pathinfo($tmpcurl['content_type'] ,PATHINFO_EXTENSION);
-
-			if(
-				substr($tmpcurl['content_type'],0,11) == 'text/turtle' ||
-				$ext == 'ttl'||
-				substr($tmpcurl['content_type'],0,19) == 'application/rdf+xml' ||
-				$ext== 'rdf' || $ext== 'xml'
-			){
+			
+			if($tmpcurl['http_code']==200){
 				$url = $tmpcurl['url'];
 			}else{
 				return false;
 			}
 		}
 		
-
 		
 		if(strpos($url, 'http') === 0)
 		{
@@ -56,8 +49,14 @@ class CensusPluginOPD extends CensusPlugin
 			$r = $base_url."/".$url;
 		}
 
-		
-		return $r; 
+		require_once( __DIR__."/../lib/arc2/arc2.php" ); 
+		require_once( __DIR__."/../lib/Graphite/Graphite.php" ); 
+		$graph = new Graphite();
+		$count = $graph->load( $r );
+		if($count) 
+			return $r; 
+		else
+			return false;
 	}	
 	
 	private function _opd_get($url,$base){
