@@ -1,7 +1,10 @@
 <?php
 
-CensusPluginRegister::instance()->register( "CensusPluginOPD" );
 
+require_once( __DIR__."/../lib/arc2/ARC2.php" ); 
+require_once( __DIR__."/../lib/Graphite/Graphite.php" ); 
+
+CensusPluginRegister::instance()->register( "CensusPluginOPD" );
 
 class CensusPluginOPD extends CensusPlugin
 {
@@ -49,8 +52,7 @@ class CensusPluginOPD extends CensusPlugin
 			$r = $base_url."/".$url;
 		}
 
-		require_once( __DIR__."/../lib/arc2/ARC2.php" ); 
-		require_once( __DIR__."/../lib/Graphite/Graphite.php" ); 
+	
 		$graph = new Graphite();
 		$count = $graph->load( $r );
 		if($count) 
