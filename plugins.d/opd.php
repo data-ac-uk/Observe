@@ -1,8 +1,12 @@
 <?php
+if(class_exists('ARC2') != true)
+{
+	require_once( __DIR__."/../lib/arc2/ARC2.php" ); 
+	require_once( __DIR__."/../lib/Graphite/Graphite.php" ); 
+}
 
 
-require_once( __DIR__."/../lib/arc2/ARC2.php" ); 
-require_once( __DIR__."/../lib/Graphite/Graphite.php" ); 
+
 
 CensusPluginRegister::instance()->register( "CensusPluginOPD" );
 
