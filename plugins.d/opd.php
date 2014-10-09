@@ -58,7 +58,8 @@ class CensusPluginOPD extends CensusPlugin
 
 	
 		$graph = new Graphite();
-		$count = $graph->load( $r );
+		$graph->load( $r );
+		$count = count($graph->allOfType( "oo:OrganizationProfileDocument" ));
 		if($count) 
 			return $r; 
 		else
