@@ -27,7 +27,6 @@ class CensusPluginLinkStats extends CensusPlugin
         $scripts = array();
         $tld = implode(".", array_slice(explode(".", $hostname),-3));
 
-
         @$dom->loadHTML( $curl->webpage );
         $xpath = new DOMXpath($dom);
         $link_nodes = $xpath->query("//a");
@@ -35,7 +34,9 @@ class CensusPluginLinkStats extends CensusPlugin
             $href = $link_node->getAttribute("href");
             $url_info = parse_url($href);
 
-
+            if(empty($href)) {
+                continue;
+            }
             if($url_info["scheme"] == "javascript") {
                 $scripts[] = $href;
             }
