@@ -4,7 +4,7 @@ CensusPluginRegister::instance()->register( "CensusPluginLinkStats" );
 class CensusPluginLinkStats extends CensusPlugin
 {
 
-    protected $id = "linkstats";
+    protected $id = "linkStats";
 
     private function endsWith($haystack, $needle)
     {
