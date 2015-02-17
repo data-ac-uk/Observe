@@ -23,18 +23,19 @@ class CensusPluginOPD extends CensusPlugin
 		$xpath = new DOMXPath($dom);
 
 		$links = $xpath->query("//link[@rel='openorg']");
-
+		
 		foreach( $links as $link_tag )
 		{
-			$url = strtolower($link_tag->getAttribute("href"));
+			$url = $link_tag->getAttribute("href");
 			break;
 		}
-
-		$base_url = preg_replace('#^(.*)/+$#', '\1', $curl->info['url']);
+		
+		$url_info = parse_url($curl->info['url']) ;
+		$base_url = "{$url_info['scheme']}://{$url_info['host']}";
 		
 		if(!isset($url)){
 			$tmpcurl = $this->_opd_get("{$base_url}/.well-known/openorg",$base_url);
-			
+		
 			if($tmpcurl['http_code']==200){
 				$url = $tmpcurl['url'];
 			}else{
@@ -56,7 +57,6 @@ class CensusPluginOPD extends CensusPlugin
 			$r = $base_url."/".$url;
 		}
 
-	
 		$graph = new Graphite();
 		$graph->load( $r );
 		$count = count($graph->allOfType( "oo:OrganizationProfileDocument" ));
