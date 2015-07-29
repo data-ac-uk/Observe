@@ -18,7 +18,6 @@ class CensusPluginOPD extends CensusPlugin
 	{
 		$dom = new DOMDocument();
 		$urls = array();
-	
 		@$dom->loadHTML( $curl->webpage );
 		$xpath = new DOMXPath($dom);
 
@@ -56,14 +55,33 @@ class CensusPluginOPD extends CensusPlugin
 		{
 			$r = $base_url."/".$url;
 		}
+		
 
-		$graph = new Graphite();
-		$graph->load( $r );
-		$count = count($graph->allOfType( "oo:OrganizationProfileDocument" ));
-		if($count) 
-			return $r; 
-		else
+		require_once( __DIR__."/../lib/OPDLib/OrgProfileDocument.php" );
+		
+		try 
+		{
+			$opd = new OrgProfileDocument( $r );
+		}
+		catch( OPD_Discover_Exception $e )
+		{
 			return false;
+		}
+		catch( OPD_Load_Exception $e )
+		{
+			return false;
+		}
+		catch( OPD_Parse_Exception $e )
+		{
+			return false;
+		}
+		catch( Exception $e ) 
+		{
+			return false;
+		}
+		
+		return $r; 
+		
 	}	
 	
 	private function _opd_get($url,$base){

@@ -7,3 +7,6 @@
 [submodule "lib/Text-Statistics"]
 	path = lib/Text-Statistics
 	url = https://github.com/patrickmcsweeney/Text-Statistics.git
+[submodule "lib/OPDLib"]
+	path = lib/OPDLib
+	url = https://github.com/data-ac-uk/OPDLib.git
